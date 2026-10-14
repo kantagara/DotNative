@@ -28,7 +28,7 @@ internal static partial class Preview
             if (args.Length == 0 || args[0] is "--help" or "help")
             {
                 Console.WriteLine(
-                    "dotnative plugin new --name Name --output path [--kind native|managed]\ndotnative plugin run <platform> --project path [--device id]\ndotnative restore --project path\ndotnative plugin build --project path --platform mac|windows|linux\ndotnative run <platform> --bindings --project path [--dotnet path] [--device id] [--build-only] [--runtime nativeaot|managed]\ndotnative devices [--all]\ndotnative run [ios|android|mac|windows|linux] --hot-reload [--project path] [--device id]\ndotnative bindings-demo ios|android|mac|windows|linux [--dotnet path] [--device id] [--build-only] [--runtime nativeaot|managed]\nInstallable DotNative CLI. Windows/Linux previews and Android NativeAOT bindings are experimental. Requires .NET 10 SDK and platform build tools."
+                    "dotnative plugin new --name Name --output path [--kind native|csharp]\ndotnative plugin run <platform> --project path [--device id]\ndotnative restore --project path\ndotnative plugin build --project path --platform mac|windows|linux\ndotnative run <platform> --bindings --project path [--dotnet path] [--device id] [--build-only] [--runtime nativeaot|managed]\ndotnative devices [--all]\ndotnative run [ios|android|mac|windows|linux] --hot-reload [--project path] [--device id]\ndotnative bindings-demo ios|android|mac|windows|linux [--dotnet path] [--device id] [--build-only] [--runtime nativeaot|managed]\nInstallable DotNative CLI. Windows/Linux previews and Android NativeAOT bindings are experimental. Requires .NET 10 SDK and platform build tools."
                 );
                 return 0;
             }

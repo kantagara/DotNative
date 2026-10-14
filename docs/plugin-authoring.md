@@ -174,7 +174,7 @@ platform confirmed.
 ## Create a C# platform plugin
 
 ```sh
-dotnative plugin new --kind managed --name Acme.Platform --output ../Acme.Platform
+dotnative plugin new --kind csharp --name Acme.Platform --output ../Acme.Platform
 ```
 
 This creates `NativeService` as a partial class with real platform implementations:

@@ -32,7 +32,7 @@ internal static partial class Preview
         }
         if (args.Length == 0 || args[0] is not ("new" or "build"))
             throw new ArgumentException(
-                "Use: dotnative plugin new --name Name --output path [--kind native|managed], or plugin build --project path --platform mac|windows|linux"
+                "Use: dotnative plugin new --name Name --output path [--kind native|csharp], or plugin build --project path --platform mac|windows|linux"
             );
         var options = new Dictionary<string, string>(StringComparer.Ordinal);
         for (var i = 1; i < args.Length; i += 2)
@@ -49,12 +49,12 @@ internal static partial class Preview
             if (options.Keys.Any(k => k is not ("--name" or "--output" or "--kind")))
                 throw new ArgumentException("Unknown plugin new option.");
             var kind = options.GetValueOrDefault("--kind", "native");
-            if (kind is not ("native" or "managed"))
-                throw new ArgumentException("Plugin kind must be native or managed.");
+            if (kind is not ("native" or "csharp"))
+                throw new ArgumentException("Plugin kind must be native or csharp.");
             var project = PluginScaffold.Create(
                 Required("--output"),
                 Required("--name"),
-                kind == "managed",
+                kind == "csharp",
                 Path.Combine(Root, "src/DotNative/DotNative.csproj"),
                 Path.Combine(Root, "templates/DotNative.App")
             );
@@ -62,7 +62,7 @@ internal static partial class Preview
             Console.WriteLine(
                 $"Example: dotnative plugin run ios --project \"{Path.GetDirectoryName(project)}\""
             );
-            if (kind == "managed")
+            if (kind == "csharp")
                 Console.WriteLine(
                     "C# Android SDK bindings with NativeAOT are experimental (DNPLUGIN001). Use a platform-targeted bindings host; remote mobile preview cannot execute native C# bindings."
                 );
