@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <DotNativePluginEntry>FilePickerPlugin</DotNativePluginEntry>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsAotCompatible>true</IsAotCompatible>
+    <Version>0.1.0-preview.1</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/DotNative/DotNative.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Platform/**/*;buildTransitive/**/*" Pack="true" PackagePath="%(Identity)" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="dotnative/plugin.json" Pack="true" PackagePath="dotnative/plugin.json" />
+    <None Update="README.md" Pack="true" PackagePath="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="../../LICENSE" Pack="true" PackagePath="/" />
+    <None Include="../../THIRD_PARTY_NOTICES" Pack="true" PackagePath="/" />
+  </ItemGroup>
+</Project>

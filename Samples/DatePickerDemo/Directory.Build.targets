@@ -1,0 +1,3 @@
+<Project>
+  <!-- The demo supplies its own source references; CLI owns native preview builds. -->
+</Project>

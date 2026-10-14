@@ -1,0 +1,5 @@
+{
+  "id": "DotNative.FilePicker",
+  "kind": "native",
+  "entry": "FilePickerPlugin"
+}

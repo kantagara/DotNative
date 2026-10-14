@@ -1,0 +1,29 @@
+// !$*UTF8*$!
+{
+ archiveVersion = 1;
+ classes = {};
+ objectVersion = 56;
+ objects = {
+  D070A7100000000000000035 = {isa = PBXShellScriptBuildPhase; alwaysOutOfDate = 1; buildActionMask = 2147483647; files = (); inputPaths = (); outputPaths = (); runOnlyForDeploymentPostprocessing = 0; name = "Embed native plugin resources"; shellPath = /bin/bash; shellScript = "export PATH=\"/usr/local/share/dotnet:/usr/local/bin:$PATH\"\nbash \"$DOTNATIVE_OUT/plugin-bundle.sh\"\n"; };
+  A00000000000000000000001 = {isa = PBXProject; attributes = { LastUpgradeCheck = 1600; }; buildConfigurationList = A00000000000000000000002; compatibilityVersion = "Xcode 14.0"; developmentRegion = en; knownRegions = (en, Base); mainGroup = A00000000000000000000003; productRefGroup = A00000000000000000000004; projectDirPath = ""; projectRoot = ""; targets = (A00000000000000000000005); };
+  A00000000000000000000002 = {isa = XCConfigurationList; buildConfigurations = (A00000000000000000000010,A00000000000000000000011); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+  A00000000000000000000003 = {isa = PBXGroup; children = (A00000000000000000000031,A00000000000000000000030,A00000000000000000000007,A00000000000000000000004); sourceTree = "<group>"; };
+  A00000000000000000000004 = {isa = PBXGroup; name = Products; children = (A00000000000000000000008); sourceTree = "<group>"; };
+  A00000000000000000000005 = {isa = PBXNativeTarget; buildConfigurationList = A00000000000000000000009; buildPhases = (A00000000000000000000020,A00000000000000000000021,A00000000000000000000022,D070A7100000000000000035); buildRules = (); dependencies = (); name = Runner; productName = FaliNamIgrac; productReference = A00000000000000000000008; productType = "com.apple.product-type.application"; };
+  A00000000000000000000006 = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+  A00000000000000000000007 = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = FaliNamIgrac.a; path = "obj/DotNative/iossimulator-arm64/FaliNamIgrac.a"; sourceTree = "<group>"; };
+  A00000000000000000000008 = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FaliNamIgrac.app; sourceTree = BUILT_PRODUCTS_DIR; };
+  A00000000000000000000009 = {isa = XCConfigurationList; buildConfigurations = (A00000000000000000000012,A00000000000000000000013); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+  A00000000000000000000010 = {isa = XCBuildConfiguration; buildSettings = { CLANG_ENABLE_OBJC_ARC = YES; IPHONEOS_DEPLOYMENT_TARGET = 16.0; SDKROOT = iphoneos; }; name = Debug; };
+  A00000000000000000000011 = {isa = XCBuildConfiguration; buildSettings = { CLANG_ENABLE_OBJC_ARC = YES; IPHONEOS_DEPLOYMENT_TARGET = 16.0; SDKROOT = iphoneos; }; name = Release; };
+  A00000000000000000000012 = {isa = XCBuildConfiguration; baseConfigurationReference = A00000000000000000000030; buildSettings = {}; name = Debug; };
+  A00000000000000000000013 = {isa = XCBuildConfiguration; baseConfigurationReference = A00000000000000000000030; buildSettings = {}; name = Release; };
+  A00000000000000000000020 = {isa = PBXShellScriptBuildPhase; alwaysOutOfDate = 1; buildActionMask = 2147483647; files = (); inputPaths = (); outputPaths = ("$(SRCROOT)/obj/DotNative/$(DOTNATIVE_RID)/FaliNamIgrac.a", "$(SRCROOT)/obj/DotNative/$(DOTNATIVE_RID)/link.rsp"); runOnlyForDeploymentPostprocessing = 0; name = "Publish C# NativeAOT"; shellPath = /bin/bash; shellScript = "export PATH=\"/usr/local/share/dotnet:/usr/local/bin:$PATH\"\nbash \"$SRCROOT/build-managed.sh\"\n"; };
+  A00000000000000000000021 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000023); runOnlyForDeploymentPostprocessing = 0; };
+  A00000000000000000000022 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+  A00000000000000000000023 = {isa = PBXBuildFile; fileRef = A00000000000000000000006; };
+  A00000000000000000000031 = {isa = PBXGroup; path = Runner; children = (A00000000000000000000006); sourceTree = "<group>"; };
+  A00000000000000000000030 = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Runner.xcconfig; sourceTree = "<group>"; };
+ };
+ rootObject = A00000000000000000000001;
+}

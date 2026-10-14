@@ -1,0 +1,48 @@
+<Project>
+  <Import Project="../packaging/DotNative.App/buildTransitive/DotNative.App.targets" />
+  <PropertyGroup>
+    <DotNativePluginBuilder>$(DotNativeRepositoryRoot)tools/DotNative.NativeBuild/bin/Release/net9.0/DotNative.NativeBuild.dll</DotNativePluginBuilder>
+    <DotNativePluginSdk>$(DotNativeRepositoryRoot)native/plugins</DotNativePluginSdk>
+    <_DotNativeRustTarget Condition="'$(RuntimeIdentifier)' == 'iossimulator-arm64'"
+      >aarch64-apple-ios-sim</_DotNativeRustTarget>
+    <_DotNativeRustTarget Condition="'$(RuntimeIdentifier)' == 'ios-arm64'"
+      >aarch64-apple-ios</_DotNativeRustTarget>
+    <_DotNativeRustTarget Condition="'$(RuntimeIdentifier)' == 'osx-arm64'"
+      >aarch64-apple-darwin</_DotNativeRustTarget>
+    <_DotNativeRustTarget Condition="'$(RuntimeIdentifier)' == 'linux-bionic-arm64'"
+      >aarch64-linux-android</_DotNativeRustTarget>
+    <DotNativeCoreArchive>$(DotNativeRepositoryRoot)native/core/target/$(_DotNativeRustTarget)/release/libcore.a</DotNativeCoreArchive>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference
+      Include="$(DotNativeRepositoryRoot)src/DotNative/DotNative.csproj"
+      GlobalPropertiesToRemove="RuntimeIdentifier;PublishAot;PublishAotUsingRuntimePack;NativeLib"
+    />
+    <ProjectReference
+      Include="$(DotNativeRepositoryRoot)plugins/DotNative.DeviceInfo/DotNative.DeviceInfo.csproj"
+      GlobalPropertiesToRemove="RuntimeIdentifier;PublishAot;PublishAotUsingRuntimePack;NativeLib"
+    />
+    <NativeFileReference Include="$(DotNativeCoreArchive)" />
+    <NativeLibrary Include="$(DotNativeCoreArchive)" />
+    <DirectPInvoke Include="core" />
+    <DotNativeNativeSource
+      Include="$(DotNativeRepositoryRoot)plugins/DotNative.DeviceInfo/native/ios/device_info.m"
+      Condition="'$(RuntimeIdentifier)' == 'ios-arm64' or '$(RuntimeIdentifier)' == 'iossimulator-arm64'"
+    />
+  </ItemGroup>
+  <Target Name="BuildDotNativePluginBuilder" BeforeTargets="StageDotNativeLinkInputs">
+    <MSBuild
+      Projects="$(DotNativeRepositoryRoot)tools/DotNative.NativeBuild/DotNative.NativeBuild.csproj"
+      Targets="Restore;Build"
+      Properties="Configuration=Release"
+      RemoveProperties="RuntimeIdentifier;PublishAot;PublishAotUsingRuntimePack;NativeLib;OutputType"
+    />
+  </Target>
+  <Target
+    Name="BuildDotNativeDevelopmentCore"
+    BeforeTargets="PrepareForBuild"
+    Condition="'$(DesignTimeBuild)' != 'true' and '$(DotNativePreviewAppProject)' == ''"
+  >
+    <Exec Command="bash &quot;$(DotNativeRepositoryRoot)eng/build-core.sh&quot; &quot;$(RuntimeIdentifier)&quot;" />
+  </Target>
+</Project>

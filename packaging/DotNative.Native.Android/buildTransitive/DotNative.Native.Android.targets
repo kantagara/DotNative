@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' == 'linux-bionic-arm64'">
+    <DotNativeCoreArchive>$(MSBuildThisFileDirectory)../runtimes/linux-bionic-arm64/native/libcore.a</DotNativeCoreArchive>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'linux-bionic-arm64'">
+    <NativeFileReference Include="$(DotNativeCoreArchive)" />
+    <NativeLibrary Include="$(DotNativeCoreArchive)" />
+    <DirectPInvoke Include="core" />
+  </ItemGroup>
+</Project>

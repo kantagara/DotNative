@@ -1,0 +1,159 @@
+<Project>
+  <PropertyGroup>
+    <DotNativePluginBuilder Condition="'$(DotNativePluginBuilder)' == ''"
+      >$(MSBuildThisFileDirectory)../tools/NativeBuild/DotNative.NativeBuild.dll</DotNativePluginBuilder>
+    <DotNativePluginSdk Condition="'$(DotNativePluginSdk)' == ''"
+      >$(MSBuildThisFileDirectory)../tools/PluginSdk</DotNativePluginSdk>
+    <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+    <TargetName>$(MSBuildProjectName)</TargetName>
+    <RootNamespace Condition="'$(RootNamespace)' == ''">$(MSBuildProjectName)</RootNamespace>
+    <DotNativeStartupType Condition="'$(DotNativeStartupType)' == ''"
+      >$(RootNamespace).Program</DotNativeStartupType>
+    <LangVersion>12</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <NativeLib>Static</NativeLib>
+    <IlcExportUnmanagedEntrypoints>true</IlcExportUnmanagedEntrypoints>
+    <OutputType>Library</OutputType>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <EventSourceSupport>false</EventSourceSupport>
+    <AppleMinOSVersion>16.0</AppleMinOSVersion>
+    <RunCommand>bash</RunCommand>
+    <RunArguments>&quot;$(MSBuildProjectDirectory)/Platform/iOS/run.sh&quot;</RunArguments>
+    <RunArguments Condition="'$(RuntimeIdentifier)' == 'osx-arm64'"
+      >&quot;$(MSBuildProjectDirectory)/Platform/Mac/run.sh&quot;</RunArguments>
+    <RunArguments Condition="'$(RuntimeIdentifier)' == 'linux-bionic-arm64'"
+      >&quot;$(MSBuildProjectDirectory)/Platform/Android/run.sh&quot;</RunArguments>
+    <RunWorkingDirectory>$(MSBuildProjectDirectory)</RunWorkingDirectory>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DefineConstants
+      Condition="'$(RuntimeIdentifier)' == 'ios-arm64' or '$(RuntimeIdentifier)' == 'iossimulator-arm64' or '$(RuntimeIdentifier)' == 'iossimulator-x64'"
+      >$(DefineConstants);DOTNATIVE_IOS</DefineConstants>
+    <DefineConstants
+      Condition="$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('iossimulator-'))"
+      >$(DefineConstants);DOTNATIVE_SIMULATOR</DefineConstants>
+    <DefineConstants
+      Condition="$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('android-')) or $([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('linux-bionic-'))"
+      >$(DefineConstants);DOTNATIVE_ANDROID</DefineConstants>
+    <DefineConstants Condition="$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('osx-'))"
+      >$(DefineConstants);DOTNATIVE_MACOS</DefineConstants>
+    <DefineConstants Condition="$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('win-'))"
+      >$(DefineConstants);DOTNATIVE_WINDOWS</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup>
+    <_DotNativeSourcePlatform
+      Condition="$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('ios'))"
+      >iOS</_DotNativeSourcePlatform>
+    <_DotNativeSourcePlatform
+      Condition="$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('android-')) or $([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('linux-bionic-'))"
+      >Android</_DotNativeSourcePlatform>
+    <_DotNativeSourcePlatform
+      Condition="$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('osx-'))"
+      >Mac</_DotNativeSourcePlatform>
+    <_DotNativeSourcePlatform
+      Condition="$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('win-'))"
+      >Windows</_DotNativeSourcePlatform>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Platform/**/*.cs" />
+    <Compile
+      Include="Platform/$(_DotNativeSourcePlatform)/**/*.cs"
+      Condition="'$(_DotNativeSourcePlatform)' != ''"
+    />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)../tools/AppEntry.cs" Visible="false" />
+    <!-- Optional C ABI functions compiled into the Xcode executable. -->
+    <DirectPInvoke Include="__Internal" />
+  </ItemGroup>
+  <Target
+    Name="ValidateDotNativePlatform"
+    BeforeTargets="PrepareForBuild"
+    Condition="'$(DotNativePreviewAppProject)' == ''"
+  >
+    <Error
+      Condition="'$(RuntimeIdentifier)' != 'ios-arm64' and '$(RuntimeIdentifier)' != 'iossimulator-arm64' and '$(RuntimeIdentifier)' != 'osx-arm64' and '$(RuntimeIdentifier)' != 'linux-bionic-arm64'"
+      Text="DotNative currently supports ARM64 iOS, iOS Simulator, macOS and experimental Android (linux-bionic-arm64)."
+    />
+  </Target>
+  <Target Name="GenerateDotNativeEntry" BeforeTargets="CoreCompile">
+    <PropertyGroup>
+      <_DotNativeEntry>$(IntermediateOutputPath)DotNative.Entry.g.cs</_DotNativeEntry>
+    </PropertyGroup>
+    <WriteLinesToFile
+      File="$(_DotNativeEntry)"
+      Lines="namespace DotNative.Generated { internal static partial class AppEntry { private static partial global::System.Threading.Tasks.Task InvokeMain() =&gt; global::DotNative.Hosting.MainEntry.Invoke(global::$(DotNativeStartupType).Main)%3B } }"
+      Overwrite="true"
+      WriteOnlyWhenDifferent="true"
+    />
+    <ItemGroup>
+      <Compile Include="$(_DotNativeEntry)" Visible="false" />
+    </ItemGroup>
+  </Target>
+  <Target
+    Name="ValidateDotNativeAppleBundleStaging"
+    BeforeTargets="StageDotNativeLinkInputs"
+    Condition="'@(DotNativeAppleDependencyManifest)' != '' and ('$(RuntimeIdentifier)' == 'ios-arm64' or '$(RuntimeIdentifier)' == 'iossimulator-arm64') and '$(DotNativeAppleBundleStagingHandled)' != 'true'"
+  >
+    <PropertyGroup>
+      <_DotNativeAppleRunner>$(MSBuildProjectDirectory)/Platform/iOS/Runner.xcodeproj/project.pbxproj</_DotNativeAppleRunner>
+    </PropertyGroup>
+    <PropertyGroup Condition="Exists('$(_DotNativeAppleRunner)')">
+      <_DotNativeAppleHasBundlePhase>$([System.IO.File]::ReadAllText('$(_DotNativeAppleRunner)').Contains('plugin-bundle.sh'))</_DotNativeAppleHasBundlePhase>
+    </PropertyGroup>
+    <Error
+      Condition="'$(_DotNativeAppleHasBundlePhase)' != 'True'"
+      Text="DNAPPLE001: iOS SDK dependencies require the native resource embedding phase. Update Platform/iOS/Runner.xcodeproj from the current DotNative template. Custom packagers must invoke plugin-bundle.sh before signing and set DotNativeAppleBundleStagingHandled=true."
+    />
+  </Target>
+  <Target
+    Name="StageDotNativeLinkInputs"
+    AfterTargets="Publish"
+    Condition="'$(DotNativePreviewAppProject)' == ''"
+  >
+    <MakeDir Directories="$(PublishDir)link-inputs" />
+    <Copy
+      SourceFiles="@(NativeLibrary)"
+      DestinationFolder="$(PublishDir)link-inputs"
+      SkipUnchangedFiles="true"
+    />
+    <WriteLinesToFile
+      File="$(PublishDir)plugin-sources.txt"
+      Lines="@(DotNativeNativeSource->'%(FullPath)')"
+      Overwrite="true"
+    />
+    <WriteLinesToFile
+      File="$(PublishDir)plugin-libraries.txt"
+      Lines="@(DotNativeNativeLibrary->'%(FullPath)')"
+      Overwrite="true"
+    />
+    <WriteLinesToFile
+      File="$(PublishDir)plugin-frameworks.txt"
+      Lines="@(DotNativeNativeFramework)"
+      Overwrite="true"
+    />
+    <WriteLinesToFile
+      File="$(PublishDir)plugin-framework-search-paths.txt"
+      Lines="@(DotNativeAppleFrameworkSearchPath->'%(FullPath)')"
+      Overwrite="true"
+    />
+    <WriteLinesToFile
+      File="$(PublishDir)plugin-apple-manifests.txt"
+      Lines="@(DotNativeAppleDependencyManifest->'%(FullPath)')"
+      Overwrite="true"
+    />
+    <WriteLinesToFile
+      File="$(PublishDir)plugin-gradle.txt"
+      Lines="@(DotNativeAndroidGradle->'%(FullPath)')"
+      Overwrite="true"
+    />
+    <WriteLinesToFile
+      File="$(PublishDir)plugin-entries.txt"
+      Lines="@(DotNativePluginEntry)"
+      Overwrite="true"
+    />
+    <Exec Command="dotnet &quot;$(DotNativePluginBuilder)&quot; &quot;$(PublishDir)&quot; &quot;$(RuntimeIdentifier)&quot; &quot;$(AppleMinOSVersion)&quot; &quot;$(DotNativePluginSdk)&quot;" />
+  </Target>
+</Project>

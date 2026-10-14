@@ -1,0 +1,27 @@
+<Project>
+  <PropertyGroup>
+    <_DotNativeIsIOS
+      Condition="'$(RuntimeIdentifier)' == 'ios-arm64' or '$(RuntimeIdentifier)' == 'iossimulator-arm64'"
+      >true</_DotNativeIsIOS>
+    <DotNativeCoreArchive
+      Condition="'$(DotNativeCoreArchive)' == '' and '$(_DotNativeIsIOS)' == 'true'"
+      >$(MSBuildThisFileDirectory)../runtimes/$(RuntimeIdentifier)/native/libcore.a</DotNativeCoreArchive>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(_DotNativeIsIOS)' == 'true'">
+    <!-- Public package item: injected during ordinary project evaluation/build. -->
+    <NativeFileReference Include="$(DotNativeCoreArchive)" />
+    <DirectPInvoke Include="core" />
+    <!-- Standalone NativeAOT consumes NativeLibrary, so adapt explicitly. -->
+    <NativeLibrary Include="@(NativeFileReference)" />
+  </ItemGroup>
+  <Target
+    Name="ValidateDotNativeNativeArchive"
+    BeforeTargets="PrepareForBuild"
+    Condition="'$(_DotNativeIsIOS)' == 'true'"
+  >
+    <Error
+      Condition="!Exists('$(DotNativeCoreArchive)')"
+      Text="Missing DotNative archive for $(RuntimeIdentifier): $(DotNativeCoreArchive)"
+    />
+  </Target>
+</Project>

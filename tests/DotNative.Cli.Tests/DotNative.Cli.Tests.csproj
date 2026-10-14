@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../tools/DotNative.Cli/PluginExample.cs" Link="PluginExample.cs" />
+    <Compile
+      Include="../../tools/DotNative.Cli/DependencyRevision.cs"
+      Link="DependencyRevision.cs"
+    />
+    <Compile Include="../../tools/DotNative.Cli/Devices.cs" Link="Devices.cs" />
+    <Compile Include="../../tools/DotNative.Cli/DesktopTarget.cs" Link="DesktopTarget.cs" />
+    <Compile Include="../../tools/DotNative.Cli/PluginScaffold.cs" Link="PluginScaffold.cs" />
+  </ItemGroup>
+</Project>

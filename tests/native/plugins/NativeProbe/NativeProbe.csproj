@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <RootNamespace>NativeProbe</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IsAotCompatible>true</IsAotCompatible>
+    <DotNativePluginKind>Native</DotNativePluginKind>
+    <DotNativePluginEntry>NativeProbePlugin</DotNativePluginEntry>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../../../src/DotNative/DotNative.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Platform/**/*;buildTransitive/**/*" Pack="true" PackagePath="%(Identity)" />
+  </ItemGroup>
+</Project>

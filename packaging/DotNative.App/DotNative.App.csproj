@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <TargetFramework>net9.0</TargetFramework>
+    <PackageId>DotNative.App</PackageId>
+    <Version>0.1.0-beta.1</Version>
+    <Authors>DotNative</Authors>
+    <Description>Single-project DotNative application build integration.</Description>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../DotNative.Essentials/DotNative.Essentials.csproj" />
+    <ProjectReference Include="../../src/DotNative/DotNative.csproj" />
+    <ProjectReference Include="../DotNative.Native.Mac/DotNative.Native.Mac.csproj" />
+    <ProjectReference Include="../DotNative.Native.Android/DotNative.Native.Android.csproj" />
+    <ProjectReference Include="../DotNative.Native.iOS/DotNative.Native.iOS.csproj" />
+    <None
+      Update="buildTransitive/DotNative.App.targets"
+      Pack="true"
+      PackagePath="buildTransitive/DotNative.App.targets"
+    />
+    <None Include="tools/AppEntry.cs" Pack="true" PackagePath="tools/AppEntry.cs" />
+    <None
+      Include="../../native/plugins/**/*"
+      Pack="true"
+      PackagePath="tools/PluginSdk/%(RecursiveDir)%(Filename)%(Extension)"
+    />
+    <None Include="../../templates/DotNative.App/README.md" Pack="true" PackagePath="README.md" />
+  </ItemGroup>
+  <Target Name="PackNativePluginBuilder" BeforeTargets="_GetPackageFiles">
+    <MSBuild
+      Projects="../../tools/DotNative.NativeBuild/DotNative.NativeBuild.csproj"
+      Targets="Restore;Build"
+      Properties="Configuration=Release"
+    />
+    <ItemGroup>
+      <None
+        Include="../../tools/DotNative.NativeBuild/bin/Release/net9.0/DotNative.NativeBuild.dll;../../tools/DotNative.NativeBuild/bin/Release/net9.0/DotNative.NativeBuild.deps.json;../../tools/DotNative.NativeBuild/bin/Release/net9.0/DotNative.NativeBuild.runtimeconfig.json"
+        Pack="true"
+        PackagePath="tools/NativeBuild"
+      />
+    </ItemGroup>
+  </Target>
+  <ItemGroup>
+    <None Include="../../LICENSE" Pack="true" PackagePath="/" />
+    <None Include="../../THIRD_PARTY_NOTICES" Pack="true" PackagePath="/" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+    <_DotNativeOriginalDirectoryProps>$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildProjectDirectory)'))</_DotNativeOriginalDirectoryProps>
+  </PropertyGroup>
+  <Import Project="$(_DotNativeOriginalDirectoryProps)" Condition="'$(_DotNativeOriginalDirectoryProps)' != ''" />
+  <PropertyGroup>
+    <BaseIntermediateOutputPath>$(DotNativeManagedBuildRoot)/$(MSBuildProjectName)/obj/</BaseIntermediateOutputPath>
+    <BaseOutputPath>$(DotNativeManagedBuildRoot)/$(MSBuildProjectName)/bin/</BaseOutputPath>
+    <DefaultItemExcludes>$(DefaultItemExcludes);**/bin/**;**/obj/**;**/artifacts/**</DefaultItemExcludes>
+  </PropertyGroup>
+</Project>

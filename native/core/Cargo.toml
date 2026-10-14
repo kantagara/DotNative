@@ -1,0 +1,64 @@
+[package]
+name = "dotnative-core"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+license = "MIT"
+
+[lib]
+name = "core"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[features]
+# Never enabled in packaged release runtimes. Loopback UI preview only.
+dev-host = []
+# In-process managed .NET host. Registers callbacks after the runtime starts.
+managed-host = []
+# Opt-in while desktop control coverage is incomplete. Headless engine tests
+# must not require GTK or a display server on Linux.
+desktop = ["dep:gtk", "dep:windows-sys"]
+
+[[bin]]
+name = "dotnative-desktop"
+path = "src/desktop_main.rs"
+required-features = ["desktop", "dev-host"]
+
+[build-dependencies]
+embed-manifest = "=1.5.0"
+
+[dependencies]
+im = "=15.1.0"
+taffy = { version = "=0.11.0", default-features = false, features = ["std", "taffy_tree", "flexbox", "grid"] }
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+
+[target.'cfg(any(target_os = "ios", target_os = "macos"))'.dependencies]
+objc2-core-graphics = { version = "=0.3.2", default-features = false, features = ["std", "CGFont", "CGDataProvider", "CGImage", "CGPath", "CGColor"] }
+
+[target.'cfg(target_os = "ios")'.dependencies]
+block2 = "=0.6.2"
+objc2 = "=0.6.4"
+objc2-foundation = { version = "=0.3.2", default-features = false, features = ["std", "NSString", "NSData", "NSArray", "NSAttributedString", "NSValue", "NSRange", "NSEnumerator", "NSDictionary"] }
+objc2-core-foundation = { version = "=0.3.2", default-features = false, features = ["std", "CFCGTypes", "CFData"] }
+objc2-quartz-core = { version = "=0.3.2", default-features = false, features = ["std", "CALayer", "CAGradientLayer", "CAShapeLayer", "CATransform3D", "CATransaction", "objc2-core-graphics"] }
+objc2-ui-kit = { version = "=0.3.2", default-features = false, features = ["std", "block2", "UIGraphicsRenderer", "UIGraphicsImageRenderer", "UIWindow", "UIViewController", "UINavigationController", "UIViewControllerTransitioning", "UIViewControllerTransitionCoordinator", "UIViewPropertyAnimator", "UIViewAnimating", "UIAccessibility", "UITabBar", "UITabBarItem", "UINavigationBar", "UINavigationBarAppearance", "UIBarAppearance", "UINavigationItem", "UIBarButtonItem", "UIBarItem", "UIGestureRecognizer", "UITapGestureRecognizer", "UIHoverGestureRecognizer", "UIPanGestureRecognizer", "UIView", "UIResponder", "UILabel", "UIButton", "UIControl", "UITextField", "UITextView", "UITextInput", "UITextInputTraits", "UISwitch", "UISlider", "UIScrollView", "UICollectionView", "UICollectionViewCell", "UICollectionViewLayout", "UIImage", "UIImageView", "UIColor", "UIFont", "UIFontDescriptor", "UIGeometry", "NSAttributedString", "NSText", "NSParagraphStyle", "objc2-core-foundation", "objc2-core-graphics", "objc2-quartz-core"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+block2 = "=0.6.2"
+objc2 = "=0.6.4"
+objc2-foundation = { version = "=0.3.2", default-features = false, features = ["std", "NSString", "NSGeometry", "NSAttributedString", "NSData", "NSNotification", "NSValue", "NSRange", "NSIndexSet", "NSArray", "NSEnumerator", "NSDictionary"] }
+objc2-core-foundation = { version = "=0.3.2", default-features = false, features = ["std", "CFCGTypes", "CFData"] }
+objc2-quartz-core = { version = "=0.3.2", default-features = false, features = ["std", "CALayer", "CAGradientLayer", "CAShapeLayer", "CATransform3D", "CATransaction", "CAAnimation", "CAMediaTiming", "CAMediaTimingFunction", "block2", "objc2-core-foundation", "objc2-core-graphics"] }
+objc2-app-kit = { version = "=0.3.2", default-features = false, features = ["std", "NSAppearance", "NSSplitViewController", "NSSplitViewItem", "NSSplitView", "NSViewController", "NSTableView", "NSTableHeaderView", "NSUserInterfaceItemIdentification", "NSTableColumn", "NSTableCellView", "NSWorkspace", "NSTrackingArea", "NSEvent", "NSToolbar", "NSToolbarItem", "NSView", "NSWindow", "NSResponder", "NSTextField", "NSControl", "NSCell", "NSButton", "NSButtonCell", "NSBezierPath", "NSActionCell", "NSSwitch", "NSSlider", "NSScrollView", "NSPanGestureRecognizer", "NSClickGestureRecognizer", "NSGestureRecognizer", "NSClipView", "NSImage", "NSImageView", "NSGraphicsContext", "NSImageRep", "NSLayoutConstraint", "NSFont", "NSFontDescriptor", "NSAttributedString", "NSColor", "NSText", "NSParagraphStyle", "objc2-core-graphics", "objc2-core-foundation", "objc2-quartz-core"] }
+
+[target.'cfg(target_os = "android")'.dependencies]
+jni = "=0.21.1"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+gtk = { package = "gtk4", version = "=0.10.1", optional = true, features = ["v4_8"] }
+
+[target.'cfg(target_os = "windows")'.dependencies]
+windows-sys = { version = "=0.61.2", optional = true, features = ["Win32_Foundation", "Win32_Graphics_Dwm", "Win32_Graphics_Gdi", "Win32_Graphics_GdiPlus", "Win32_UI_Shell", "Win32_System_Com", "Win32_System_Registry", "Win32_UI_Input_KeyboardAndMouse", "Win32_System_LibraryLoader", "Win32_System_SystemServices", "Win32_UI_Controls", "Win32_UI_Accessibility", "Win32_UI_HiDpi", "Win32_UI_WindowsAndMessaging"] }

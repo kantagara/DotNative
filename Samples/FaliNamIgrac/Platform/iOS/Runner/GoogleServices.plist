@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>GADApplicationIdentifier</key>
+  <string>ca-app-pub-3613334758684848~8673510634</string>
+  <key>NSUserTrackingUsageDescription</key>
+  <string>Identifikator se koristi da bi oglasi bili relevantni.</string>
+</dict>
+</plist>

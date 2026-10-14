@@ -1,0 +1,13 @@
+<Project>
+  <!-- Counter's explicit opt-in. Ordinary generated apps keep their normal TFM. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0-$(DotNativeBindingsPlatform)</TargetFramework>
+    <TargetFramework
+      Condition="'$(DotNativeBindingsPlatform)' == 'ios' or '$(DotNativeBindingsPlatform)' == 'macos'"
+      >net10.0-$(DotNativeBindingsPlatform)26.5</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <PublishAotUsingRuntimePack>false</PublishAotUsingRuntimePack>
+    <PublishAotUsingRuntimePack Condition="'$(DotNativeBindingsPlatform)' == 'android'"
+      >true</PublishAotUsingRuntimePack>
+  </PropertyGroup>
+</Project>

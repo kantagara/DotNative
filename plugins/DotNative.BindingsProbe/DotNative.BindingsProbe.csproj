@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework Condition="'$(DotNativeBindingsPlatform)' == 'android'"
+      >net10.0-android</TargetFramework>
+    <TargetFramework Condition="'$(DotNativeBindingsPlatform)' == 'windows'"
+      >net10.0-windows10.0.19041.0</TargetFramework>
+    <TargetFramework
+      Condition="'$(DotNativeBindingsPlatform)' == 'ios' or '$(DotNativeBindingsPlatform)' == 'macos'"
+      >net10.0-$(DotNativeBindingsPlatform)26.5</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineConstants Condition="'$(DotNativeBindingsPlatform)' == 'linux'"
+      >$(DefineConstants);DOTNATIVE_LINUX</DefineConstants>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,4 @@
+<Project>
+  <!-- This showcase supplies its own framework and plugin references.
+       Native preview builds are managed by the repository CLI. -->
+</Project>

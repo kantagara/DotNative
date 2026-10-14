@@ -1,0 +1,17 @@
+# Native runner sources belong in the app despite the repository's mobile ignores.
+!Platform/Android/
+!Platform/Android/**
+!Platform/iOS/
+!Platform/iOS/**
+**/bin/
+**/obj/
+artifacts/
+**/.gradle/
+**/.kotlin/
+**/build/
+**/xcuserdata/
+**/local.properties
+**/.DS_Store
+.dotnative/
+dotnative.local.props
+.env

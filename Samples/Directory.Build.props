@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <!-- Repository examples develop against source. Generated apps use NuGet. -->
+    <DotNativeDevelopment Condition="'$(DotNativeDevelopment)' == ''">true</DotNativeDevelopment>
+    <DotNativeRepositoryRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..'))/</DotNativeRepositoryRoot>
+  </PropertyGroup>
+</Project>

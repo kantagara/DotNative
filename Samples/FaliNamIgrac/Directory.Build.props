@@ -1,0 +1,7 @@
+<Project>
+  <Import Project="$(MSBuildThisFileDirectory)dotnative.dependencies.props" />
+  <Import
+    Project="$(MSBuildThisFileDirectory)dotnative.local.props"
+    Condition="Exists('$(MSBuildThisFileDirectory)dotnative.local.props')"
+  />
+</Project>

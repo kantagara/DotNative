@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <TargetFramework>net9.0</TargetFramework>
+    <PackageId>DotNative.Native.iOS</PackageId>
+    <Version>0.1.0-beta.1</Version>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Authors>DotNative</Authors>
+    <Description>DotNative Rust/UIKit static libraries and automatic NativeAOT linking inputs.</Description>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="../../native/core/ios.md" Pack="true" PackagePath="README.md" />
+    <None
+      Update="buildTransitive/DotNative.Native.iOS.targets"
+      Pack="true"
+      PackagePath="buildTransitive/DotNative.Native.iOS.targets"
+    />
+    <None
+      Include="../../native/core/target/aarch64-apple-ios/release/libcore.a"
+      Pack="true"
+      PackagePath="runtimes/ios-arm64/native/"
+    />
+    <None
+      Include="../../native/core/target/aarch64-apple-ios-sim/release/libcore.a"
+      Pack="true"
+      PackagePath="runtimes/iossimulator-arm64/native/"
+    />
+  </ItemGroup>
+  <Target Name="RequireNativeBuilds" BeforeTargets="Pack">
+    <Error
+      Condition="!Exists('../../native/core/target/aarch64-apple-ios/release/libcore.a') or !Exists('../../native/core/target/aarch64-apple-ios-sim/release/libcore.a')"
+      Text="Build both iOS Rust release targets before packing."
+    />
+  </Target>
+  <ItemGroup>
+    <None Include="../../LICENSE" Pack="true" PackagePath="/" />
+    <None Include="../../THIRD_PARTY_NOTICES" Pack="true" PackagePath="/" />
+  </ItemGroup>
+</Project>

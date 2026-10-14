@@ -1,0 +1,19 @@
+name: Publication source checks
+on:
+  workflow_dispatch:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  secrets:
+    runs-on: macos-14
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install secret scanner
+        run: brew install gitleaks
+      - name: Scan publication history and tracked contents
+        run: bash scripts/check-publication-secrets.sh

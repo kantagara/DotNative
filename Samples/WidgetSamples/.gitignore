@@ -1,0 +1,48 @@
+# .NET, NuGet and native build products
+**/bin/
+**/obj/
+**/target/
+**/artifacts/
+*.nupkg
+*.snupkg
+*.dSYM/
+*.xcarchive/
+
+# Android / Gradle (keep the Gradle wrapper JAR)
+**/.gradle/
+**/.kotlin/
+**/Platform/Android/**/build/
+**/local.properties
+.cxx/
+.externalNativeBuild/
+
+# IDE and per-user workspace state
+**/.idea/
+**/.vs/
+**/xcuserdata/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.DS_Store
+
+# Local credentials, signing and environment configuration
+.env
+.env.*
+!.env.example
+!.env.sample
+*.p12
+*.pfx
+*.key
+*.keystore
+*.jks
+*.mobileprovision
+*.provisionprofile
+
+# Test and diagnostic output
+TestResults/
+**/TestResults/
+coverage/
+*.log
+*.dmp
+*.core

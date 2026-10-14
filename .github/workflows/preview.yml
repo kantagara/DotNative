@@ -1,0 +1,72 @@
+name: Build downloadable desktop previews
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            platform: linux
+          - os: windows-latest
+            platform: windows
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            9.0.x
+            10.0.x
+      - name: Install Rust
+        shell: bash
+        run: |
+          rustup toolchain install 1.94.0 --profile minimal
+          rustup override set 1.94.0
+      - name: Configure MSVC
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+      - name: Install Linux build and runtime prerequisites
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y build-essential pkg-config libgtk-4-dev clang zlib1g-dev xvfb dbus-x11
+      - name: Build NativeAOT demo from source
+        run: dotnet run --project tools/DotNative.Cli -- run ${{ matrix.platform }} --bindings --project Samples/WidgetSamples --build-only
+      - name: Stage distributable directory
+        shell: bash
+        run: |
+          output="artifacts/bindings-integration/desktop/${{ matrix.platform }}/WidgetSamples"
+          cp LICENSE "$output/LICENSE"
+          cp packaging/preview/README.txt "$output/README.txt"
+          git rev-parse HEAD > "$output/SOURCE.txt"
+          echo "${{ matrix.os }} / x64 / NativeAOT host + Rust renderer" >> "$output/SOURCE.txt"
+          if [ "$RUNNER_OS" = Linux ]; then
+            cp packaging/preview/run-linux.sh "$output/run-linux.sh"
+            chmod +x "$output/run-linux.sh"
+          fi
+      - name: Archive demo
+        shell: bash
+        run: |
+          python3 - <<'PYCODE'
+          import pathlib, shutil
+          folder = pathlib.Path('artifacts/bindings-integration/desktop/${{ matrix.platform }}/WidgetSamples')
+          format = 'gztar' if '${{ matrix.platform }}' == 'linux' else 'zip'
+          shutil.make_archive('dotnative-${{ matrix.platform }}-x64-preview', format, folder)
+          PYCODE
+      - name: Verify extracted Linux package startup
+        if: runner.os == 'Linux'
+        run: |
+          mkdir "$RUNNER_TEMP/extracted-demo"
+          tar -xzf dotnative-linux-x64-preview.tar.gz -C "$RUNNER_TEMP/extracted-demo"
+          xvfb-run -a dbus-run-session -- python3 tests/native/preview-package-smoke.py "$RUNNER_TEMP/extracted-demo"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dotnative-${{ matrix.platform }}-x64-preview
+          path: dotnative-${{ matrix.platform }}-x64-preview.*
+          if-no-files-found: error

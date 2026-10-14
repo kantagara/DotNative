@@ -1,0 +1,27 @@
+<Project>
+  <PropertyGroup>
+    <_DotNativeOriginalDirectoryTargets>$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildProjectDirectory)'))</_DotNativeOriginalDirectoryTargets>
+  </PropertyGroup>
+  <Import Project="$(_DotNativeOriginalDirectoryTargets)" Condition="'$(_DotNativeOriginalDirectoryTargets)' != ''" />
+  <!-- Preview is a managed process even when the application normally publishes AOT. -->
+  <PropertyGroup Condition="'$(DotNativePreviewAppProject)' != '' and '$(DotNativeBindingsPlatform)' == ''">
+    <RuntimeIdentifier></RuntimeIdentifier>
+    <RuntimeIdentifiers></RuntimeIdentifiers>
+    <PublishAot>false</PublishAot>
+    <PublishAotUsingRuntimePack>false</PublishAotUsingRuntimePack>
+    <SelfContained>false</SelfContained>
+    <NativeLib></NativeLib>
+    <DefineConstants>$(DefineConstants);DOTNATIVE_$(DotNativePlatform);DOTNATIVE_REMOTE_PREVIEW</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(MSBuildProjectFullPath)' == '$(DotNativePreviewAppProject)' and '$(DotNativeBindingsPlatform)' == ''">
+    <!-- Use the CLI's SDK, including for an app normally built from NuGet. -->
+    <PackageReference Remove="DotNative;DotNative.App" />
+    <ProjectReference Remove="@(ProjectReference->WithMetadataValue('Filename', 'DotNative'))" />
+    <ProjectReference Include="$(MSBuildThisFileDirectory)../src/DotNative/DotNative.csproj" />
+  </ItemGroup>
+  <!-- Outer multi-target nodes coordinate builds but have no compiler metadata.
+       Keep graph edges for discovery; only inner TFM nodes reference assemblies. -->
+  <ItemGroup Condition="'$(DesignTimeBuild)' == 'true' and '$(IsCrossTargetingBuild)' == 'true' and '$(DotNativePreviewAppProject)' != ''">
+    <ProjectReference Update="@(ProjectReference)" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+</Project>

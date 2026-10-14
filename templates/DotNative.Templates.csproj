@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <TargetFramework>net9.0</TargetFramework>
+    <PackageId>DotNative.Templates</PackageId>
+    <Version>0.1.0-beta.1</Version>
+    <Authors>DotNative</Authors>
+    <Description>DotNative mobile app templates with a NativeAOT library and Xcode runner.</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageType>Template</PackageType>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <ContentTargetFolders>content</ContentTargetFolders>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultContentItems>false</EnableDefaultContentItems>
+    <NoDefaultExcludes>true</NoDefaultExcludes>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
+    <Content
+      Include="DotNative.App/**/*"
+      Exclude="DotNative.App/**/.gradle/**;DotNative.App/**/build/**;DotNative.App/**/bin/**;DotNative.App/**/obj/**;DotNative.App/**/artifacts/**;**/.DS_Store;DotNative.App/**/xcuserdata/**"
+    />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="../LICENSE" Pack="true" PackagePath="/" />
+    <None Include="../THIRD_PARTY_NOTICES" Pack="true" PackagePath="/" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,126 @@
+<Project>
+  <PropertyGroup>
+    <DotNativeDependenciesRoot>$(MSBuildThisFileDirectory).dotnative/dependencies</DotNativeDependenciesRoot>
+    <DotNativeSourceRoot Condition="'$(DotNativeSourceRoot)' == ''"
+      >$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../..'))</DotNativeSourceRoot>
+    <DotNativeHiveRoot Condition="'$(DotNativeHiveRoot)' == ''"
+      >$(DotNativeDependenciesRoot)/DotNative.Hive</DotNativeHiveRoot>
+    <DotNativeImagePickerRoot Condition="'$(DotNativeImagePickerRoot)' == ''"
+      >$(DotNativeDependenciesRoot)/DotNative.ImagePicker</DotNativeImagePickerRoot>
+    <DotNativeCompositionRoot Condition="'$(DotNativeCompositionRoot)' == ''"
+      >$(DotNativeDependenciesRoot)/DotNative.Composition</DotNativeCompositionRoot>
+    <DotNativeToastRoot Condition="'$(DotNativeToastRoot)' == ''"
+      >$(DotNativeDependenciesRoot)/DotNative.Toast</DotNativeToastRoot>
+    <DotNativeFirebaseRoot Condition="'$(DotNativeFirebaseRoot)' == ''"
+      >$(DotNativeDependenciesRoot)/DotNative.Firebase.preview2</DotNativeFirebaseRoot>
+    <DotNativeMobileAdsRoot Condition="'$(DotNativeMobileAdsRoot)' == ''"
+      >$(DotNativeDependenciesRoot)/DotNative.GoogleMobileAds.preview2</DotNativeMobileAdsRoot>
+    <DotNativeSecureStorageRoot Condition="'$(DotNativeSecureStorageRoot)' == ''"
+      >$(DotNativeDependenciesRoot)/DotNative.SecureStorage</DotNativeSecureStorageRoot>
+    <DotNativePreferencesRoot Condition="'$(DotNativePreferencesRoot)' == ''"
+      >$(DotNativeDependenciesRoot)/DotNative.Preferences.preview3</DotNativePreferencesRoot>
+    <DotNativeWheelDatePickerRoot Condition="'$(DotNativeWheelDatePickerRoot)' == ''"
+      >$(DotNativeDependenciesRoot)/DotNative.WheelDatePicker</DotNativeWheelDatePickerRoot>
+    <DotNativeWheelTimePickerRoot Condition="'$(DotNativeWheelTimePickerRoot)' == ''"
+      >$(DotNativeDependenciesRoot)/DotNative.WheelTimePicker</DotNativeWheelTimePickerRoot>
+    <DotNativeSvgRoot Condition="'$(DotNativeSvgRoot)' == ''"
+      >$(DotNativeDependenciesRoot)/DotNative.Svg</DotNativeSvgRoot>
+    <DotNativeLocalizationRoot Condition="'$(DotNativeLocalizationRoot)' == ''"
+      >$(DotNativeDependenciesRoot)/DotNative.Localization</DotNativeLocalizationRoot>
+    <DotNativeCognitoRoot Condition="'$(DotNativeCognitoRoot)' == ''"
+      >$(DotNativeDependenciesRoot)/DotNative.Cognito.preview2</DotNativeCognitoRoot>
+    <DotNativeMapLauncherRoot Condition="'$(DotNativeMapLauncherRoot)' == ''"
+      >$(DotNativeDependenciesRoot)/DotNative.MapLauncher</DotNativeMapLauncherRoot>
+    <DotNativeShareRoot Condition="'$(DotNativeShareRoot)' == ''"
+      >$(DotNativeDependenciesRoot)/DotNative.Share</DotNativeShareRoot>
+    <DotNativePdfViewRoot Condition="'$(DotNativePdfViewRoot)' == ''"
+      >$(DotNativeDependenciesRoot)/DotNative.PdfView</DotNativePdfViewRoot>
+  </PropertyGroup>
+  <ItemGroup>
+    <DotNativeDependency
+      Include="DotNative.Cognito.preview2"
+      Repository="https://github.com/kantagara/DotNative.Cognito.git"
+      Revision="v0.1.0-preview.2"
+    />
+    <DotNativeDependency
+      Include="DotNative.Composition"
+      Repository="https://github.com/kantagara/DotNative.Composition.git"
+      Revision="v0.1.0-preview.1"
+    />
+    <DotNativeDependency
+      Include="DotNative.FilePicker"
+      Repository="https://github.com/kantagara/DotNative.FilePicker.git"
+      Revision="v0.1.0-preview.1"
+    />
+    <DotNativeDependency
+      Include="DotNative.Firebase.preview2"
+      Repository="https://github.com/kantagara/DotNative.Firebase.git"
+      Revision="v0.1.0-preview.2"
+    />
+    <DotNativeDependency
+      Include="DotNative.GoogleMobileAds.preview2"
+      Repository="https://github.com/kantagara/DotNative.GoogleMobileAds.git"
+      Revision="v0.1.0-preview.2"
+    />
+    <DotNativeDependency
+      Include="DotNative.Hive"
+      Repository="https://github.com/kantagara/DotNative.Hive.git"
+      Revision="v0.1.0-preview.1"
+    />
+    <DotNativeDependency
+      Include="DotNative.ImagePicker"
+      Repository="https://github.com/kantagara/DotNative.ImagePicker.git"
+      Revision="v0.1.0-preview.1"
+    />
+    <DotNativeDependency
+      Include="DotNative.Localization"
+      Repository="https://github.com/kantagara/DotNative.Localization.git"
+      Revision="v0.1.0-preview.2"
+    />
+    <DotNativeDependency
+      Include="DotNative.Preferences.preview3"
+      Repository="https://github.com/kantagara/DotNative.Preferences.git"
+      Revision="v0.1.0-preview.3"
+    />
+    <DotNativeDependency
+      Include="DotNative.SecureStorage"
+      Repository="https://github.com/kantagara/DotNative.SecureStorage.git"
+      Revision="v0.1.0-preview.3"
+    />
+    <DotNativeDependency
+      Include="DotNative.Svg"
+      Repository="https://github.com/kantagara/DotNative.Svg.git"
+      Revision="v0.1.0-preview.1"
+    />
+    <DotNativeDependency
+      Include="DotNative.Toast"
+      Repository="https://github.com/kantagara/DotNative.Toast.git"
+      Revision="v0.1.0-preview.1"
+    />
+    <DotNativeDependency
+      Include="DotNative.WheelDatePicker"
+      Repository="https://github.com/kantagara/DotNative.WheelDatePicker.git"
+      Revision="v0.1.0-preview.1"
+    />
+    <DotNativeDependency
+      Include="DotNative.WheelTimePicker"
+      Repository="https://github.com/kantagara/DotNative.WheelTimePicker.git"
+      Revision="v0.1.0-preview.1"
+    />
+    <DotNativeDependency
+      Include="DotNative.MapLauncher"
+      Repository="https://github.com/kantagara/DotNative.MapLauncher.git"
+      Revision="v0.1.0-preview.1"
+    />
+    <DotNativeDependency
+      Include="DotNative.Share"
+      Repository="https://github.com/kantagara/DotNative.Share.git"
+      Revision="v0.1.0-preview.1"
+    />
+    <DotNativeDependency
+      Include="DotNative.PdfView"
+      Repository="https://github.com/kantagara/DotNative.PdfView.git"
+      Revision="v0.1.0-preview.2"
+    />
+  </ItemGroup>
+</Project>

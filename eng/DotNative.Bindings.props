@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+    <DotNativeRepositoryRoot>$(MSBuildThisFileDirectory)../</DotNativeRepositoryRoot>
+    <DotNativeDevelopment>true</DotNativeDevelopment>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)../artifacts/bindings-integration/build/$(DotNativeBindingsPlatform)/$(MSBuildProjectName)/obj/</BaseIntermediateOutputPath>
+    <BaseOutputPath>$(MSBuildThisFileDirectory)../artifacts/bindings-integration/build/$(DotNativeBindingsPlatform)/$(MSBuildProjectName)/bin/</BaseOutputPath>
+    <DefaultItemExcludes>$(DefaultItemExcludes);**/bin/**;**/obj/**;**/artifacts/**</DefaultItemExcludes>
+  </PropertyGroup>
+</Project>

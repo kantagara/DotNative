@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net10.0;net10.0-android;net10.0-ios;net10.0-macos;net10.0-windows10.0.19041.0</TargetFrameworks>
+    <RootNamespace>ManagedProbe</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IsAotCompatible>true</IsAotCompatible>
+    <DotNativePluginKind>Managed</DotNativePluginKind>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../../../src/DotNative/DotNative.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Platform/**/*;buildTransitive/**/*" Pack="true" PackagePath="%(Identity)" />
+  </ItemGroup>
+  <PropertyGroup>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(DotNativeBindingsPlatform)' == 'android'">
+    <TargetFrameworks>net10.0-android</TargetFrameworks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(DotNativeBindingsPlatform)' == 'ios'">
+    <TargetFrameworks>net10.0-ios</TargetFrameworks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(DotNativeBindingsPlatform)' == 'macos'">
+    <TargetFrameworks>net10.0-macos</TargetFrameworks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(DotNativeBindingsPlatform)' == 'windows'">
+    <TargetFrameworks>net10.0-windows10.0.19041.0</TargetFrameworks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(DotNativeBindingsPlatform)' == 'linux'">
+    <TargetFrameworks>net10.0</TargetFrameworks>
+  </PropertyGroup>
+  <Import Project="PlatformSources.targets" />
+</Project>

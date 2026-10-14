@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net9.0;net10.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <LocalizationRoot>../../Samples/FaliNamIgrac/.dotnative/dependencies/DotNative.Localization</LocalizationRoot>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../Samples/FaliNamIgrac/FaliNamIgrac.csproj" />
+    <Analyzer Include="$(LocalizationRoot)/src/DotNative.Localization.Generator/bin/$(Configuration)/netstandard2.0/DotNative.Localization.Generator.dll" />
+    <Analyzer Include="$(LocalizationRoot)/src/DotNative.Localization.Generator/bin/$(Configuration)/netstandard2.0/DotNative.Localization.Compiler.dll" />
+    <Analyzer Include="$(NuGetPackageRoot)newtonsoft.json/13.0.3/lib/netstandard2.0/Newtonsoft.Json.dll" />
+    <AdditionalFiles Include="Fixtures/l10n.json;Fixtures/*.arb" />
+    <None
+      Include="../../Samples/FaliNamIgrac/Resources/Assets/localizations/*.arb"
+      Link="AppArb/%(Filename)%(Extension)"
+      CopyToOutputDirectory="PreserveNewest"
+    />
+  </ItemGroup>
+</Project>

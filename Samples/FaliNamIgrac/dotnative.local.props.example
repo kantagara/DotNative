@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+    <DotNativeHiveRoot>/path/to/DotNative.Hive</DotNativeHiveRoot>
+    <DotNativeImagePickerRoot>/path/to/DotNative.ImagePicker</DotNativeImagePickerRoot>
+    <DotNativeSecureStorageRoot>/path/to/DotNative.SecureStorage</DotNativeSecureStorageRoot>
+    <DotNativePreferencesRoot>/path/to/DotNative.Preferences</DotNativePreferencesRoot>
+    <DotNativeWheelDatePickerRoot>/path/to/DotNative.WheelDatePicker</DotNativeWheelDatePickerRoot>
+    <DotNativeWheelTimePickerRoot>/path/to/DotNative.WheelTimePicker</DotNativeWheelTimePickerRoot>
+    <DotNativeCognitoRoot>/path/to/DotNative.Cognito</DotNativeCognitoRoot>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <ItemGroup Condition="$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('ios'))">
+    <DotNativeNativeSource Include="$(MSBuildThisFileDirectory)../Platform/iOS/**/*.swift" />
+    <DotNativePluginEntry Include="NativeProbePlugin" />
+  </ItemGroup>
+  <ItemGroup Condition="$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('osx-'))">
+    <DotNativeNativeSource Include="$(MSBuildThisFileDirectory)../Platform/Mac/**/*.swift" />
+    <DotNativePluginEntry Include="NativeProbePlugin" />
+  </ItemGroup>
+  <ItemGroup Condition="$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('linux-bionic-'))">
+    <DotNativeNativeSource Include="$(MSBuildThisFileDirectory)../Platform/Android/**/*.kt" />
+    <DotNativePluginEntry Include="NativeProbePlugin" />
+  </ItemGroup>
+  <ItemGroup Condition="$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('android-'))">
+    <DotNativeNativeSource Include="$(MSBuildThisFileDirectory)../Platform/Android/**/*.kt" />
+    <DotNativePluginEntry Include="NativeProbePlugin" />
+  </ItemGroup>
+  <ItemGroup Condition="$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('win-'))">
+    <DotNativeNativeSource Include="$(MSBuildThisFileDirectory)../Platform/Windows/**/*.cpp" />
+    <DotNativePluginEntry Include="NativeProbePlugin" />
+  </ItemGroup>
+  <ItemGroup Condition="$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('linux-')) and !$([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('linux-bionic-'))">
+    <DotNativeNativeSource Include="$(MSBuildThisFileDirectory)../Platform/Linux/**/*.cpp" />
+    <DotNativePluginEntry Include="NativeProbePlugin" />
+  </ItemGroup>
+</Project>

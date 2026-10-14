@@ -1,0 +1,99 @@
+name: Experimental desktop previews
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            9.0.x
+            10.0.x
+      - name: Install Rust
+        run: |
+          rustup toolchain install 1.94.0 --profile minimal
+          rustup override set 1.94.0
+      - name: Install GTK and virtual display
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libgtk-4-dev xvfb dbus-x11 python3-pyatspi xdotool
+      - name: Check desktop CLI routing
+        run: dotnet run --project tests/DotNative.Cli.Tests -c Release
+      - name: Build CLI
+        run: dotnet build tools/DotNative.Cli -c Release
+      - name: Build native desktop preview
+        run: cargo build --release --locked --manifest-path native/core/Cargo.toml --features desktop,dev-host --bin dotnative-desktop
+      - name: Exercise GTK controls
+        if: runner.os == 'Linux'
+        run: xvfb-run -a dbus-run-session -- native/core/target/release/dotnative-desktop --smoke
+      - name: Configure MSVC for WinUI NativeAOT
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+      - name: Build the Windows performance collector
+        if: runner.os == 'Windows'
+        run: dotnet build benchmarks/windows/Driver -c Release
+      - name: Publish WinUI 3 renderer
+        if: runner.os == 'Windows'
+        run: dotnet publish native/winui/DotNative.WinUI.csproj -c Release -r win-x64 -o native/core/target/release
+      - name: Exercise WinUI 3 controls
+        if: runner.os == 'Windows'
+        run: native/core/target/release/dotnative-desktop.exe --smoke
+      - name: Exercise WinUI WidgetSamples navigation and radio groups
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $props = Join-Path $env:RUNNER_TEMP 'widget-plugins.props'
+          $plugin = [Security.SecurityElement]::Escape("$env:GITHUB_WORKSPACE/plugins/DotNative.FilePicker/DotNative.FilePicker.csproj")
+          "<Project><ItemGroup><ProjectReference Include='$plugin' /></ItemGroup></Project>" | Set-Content $props
+          dotnet publish tools/DotNative.DevHost -c Release -r win-x64 --self-contained true "-p:DotNativeApp=$env:GITHUB_WORKSPACE/Samples/WidgetSamples" -p:DotNativeStartupType=WidgetSamples.Program -p:DotNativePlatform=WINDOWS "-p:DotNativePreviewPlugins=$props" -o native/core/target/release/managed
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          tests/native/run-winui-navigation.ps1 -AppDirectory "$env:GITHUB_WORKSPACE/native/core/target/release" -OutputDirectory "$env:RUNNER_TEMP/winui-navigation"
+      - name: Preserve WinUI navigation evidence
+        if: always() && runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: winui-navigation
+          path: ${{ runner.temp }}/winui-navigation
+      - name: Exercise GTK virtual list with 10,000 rows
+        if: runner.os == 'Linux'
+        run: |
+          dotnet publish tools/DotNative.DevHost -c Release -r linux-x64 --self-contained true -p:DotNativeApp="$GITHUB_WORKSPACE/tests/native/VirtualListApp" -p:DotNativeStartupType=InteractionApp.Program -p:DotNativePlatform=LINUX -o "$RUNNER_TEMP/virtual-list-managed"
+          bash tests/native/run-linux-interactions.sh native/core/target/release/dotnative-desktop "$RUNNER_TEMP/virtual-list-managed" "$RUNNER_TEMP/virtual-list-evidence" --virtual-list
+      - name: Build Counter development host
+        shell: bash
+        run: |
+          platform=WINDOWS
+          if [ "$RUNNER_OS" = Linux ]; then platform=LINUX; fi
+          dotnet build tools/DotNative.DevHost -p:DotNativeApp="$GITHUB_WORKSPACE/Samples/Counter" -p:DotNativeStartupType=Counter.Program -p:DotNativePlatform="$platform"
+
+      - name: Configure MSVC for native plugins
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+      - name: Test C++ plugin codec and cancellation
+        if: runner.os == 'Linux'
+        run: |
+          c++ -std=c++17 -Wall -Wextra -Werror -pthread -I native/plugins/cpp tests/native/plugins/cpp-sdk-test.cpp -o /tmp/plugin-sdk-test
+          /tmp/plugin-sdk-test
+      - name: Test C++ plugin codec and cancellation (MSVC)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          cl /nologo /std:c++17 /EHsc /I native/plugins/cpp tests/native/plugins/cpp-sdk-test.cpp /Fe:plugin-sdk-test.exe
+          plugin-sdk-test.exe
+      - name: Run native and C# NativeAOT plugins through GTK
+        if: runner.os == 'Linux'
+        run: xvfb-run -a dbus-run-session -- python3 tests/native/run-desktop-plugin-test.py
+      - name: Run native and C# NativeAOT plugins through WinUI 3
+        if: runner.os == 'Windows'
+        run: python tests/native/run-desktop-plugin-test.py

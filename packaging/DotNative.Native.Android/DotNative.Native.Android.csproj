@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <TargetFramework>net9.0</TargetFramework>
+    <PackageId>DotNative.Native.Android</PackageId>
+    <Version>0.1.0-beta.1</Version>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <None
+      Update="buildTransitive/DotNative.Native.Android.targets"
+      Pack="true"
+      PackagePath="buildTransitive/DotNative.Native.Android.targets"
+    />
+    <None
+      Include="../../native/core/target/aarch64-linux-android/release/libcore.a"
+      Pack="true"
+      PackagePath="runtimes/linux-bionic-arm64/native/"
+    />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="../../LICENSE" Pack="true" PackagePath="/" />
+    <None Include="../../THIRD_PARTY_NOTICES" Pack="true" PackagePath="/" />
+  </ItemGroup>
+</Project>

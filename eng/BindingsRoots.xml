@@ -1,0 +1,6 @@
+<linker>
+    <!-- Called by the native runner, not from the managed Main entry point. -->
+    <assembly fullname="Counter">
+        <type fullname="DotNative.Generated.AppEntry" preserve="all" />
+    </assembly>
+</linker>

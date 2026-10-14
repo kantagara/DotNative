@@ -1,0 +1,133 @@
+name: Core checks
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            9.0.x
+            10.0.x
+      - name: Install pinned Rust toolchain
+        run: |
+          rustup toolchain install 1.94.0 --profile minimal --component rustfmt
+          rustup override set 1.94.0
+      - name: Check formatting
+        run: bash scripts/format.sh check
+      - name: Test managed runtime
+        run: dotnet run --project tests/DotNative.Tests/DotNative.Tests.csproj -c Release
+      - name: Test Rust engine
+        run: cargo test --locked --manifest-path native/core/Cargo.toml
+      - name: Verify generated sample scaffolding
+        run: |
+          dotnet new install ./templates/DotNative.App
+          dotnet run --project tests/DotNative.Template.Tests -c Release
+
+  font-collections:
+    runs-on: macos-14
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            9.0.x
+            10.0.x
+      - name: Install pinned Rust toolchain
+        run: |
+          rustup toolchain install 1.94.0 --profile minimal
+          rustup override set 1.94.0
+      - name: Extract TTC and OTC faces through the managed API
+        run: dotnet run --project tests/DotNative.Tests -c Release -- --export-font-collections "$RUNNER_TEMP/font-collections"
+      - name: Register and measure extracted faces with AppKit
+        env:
+          DOTNATIVE_FONT_COLLECTION_FIXTURES: ${{ runner.temp }}/font-collections
+        run: cargo test --locked --manifest-path native/core/Cargo.toml --features dev-host asset_family_and_variation_change_native_glyph_metrics
+      - name: Test Swift plugin codec and native service compilation
+        run: |
+          clang -c tests/native/plugins/swift-sdk-stubs.c -o /tmp/plugin-stubs.o
+          swiftc -parse-as-library native/plugins/apple/PluginChannels.swift tests/native/plugins/swift-sdk-test.swift /tmp/plugin-stubs.o -o /tmp/plugin-swift-test
+          /tmp/plugin-swift-test
+          dotnet run --project tools/DotNative.Cli -- plugin new --output "$RUNNER_TEMP/native-plugin" --name NativeService
+          dotnet run --project tools/DotNative.Cli -- plugin build --project "$RUNNER_TEMP/native-plugin" --platform mac
+      - name: Verify managed quickstart build isolation
+        run: python3 tests/native/test-preview-build.py
+      - name: Verify native plugin publication inputs
+        run: python3 tests/native/test-plugin-packaging.py
+      - name: Link and run an Apple app without plugins
+        run: python3 tests/native/test-empty-apple-registration.py
+      - name: Verify Apple dependency integrity and bundle staging
+        run: |
+          dotnet run --project tests/AppleDependencies.Tests -c Release
+          python3 tests/native/test-apple-staging-contract.py
+      - name: Verify notification dispatch and APNs lifecycle
+        run: python3 tests/native/test-notification-channels.py
+      - name: Build native AppKit runtime
+        run: cargo build --locked --manifest-path native/core/Cargo.toml
+      - name: Exercise AppKit virtual list recycling
+        run: cargo run --locked --manifest-path native/core/Cargo.toml --features dev-host --example desktop_virtual_list_smoke
+      - name: Exercise native control focus and blur
+        run: |
+          clang -fobjc-arc -framework AppKit tests/native/macos-focus-smoke.m -L native/core/target/debug -lcore -Wl,-rpath,"$PWD/native/core/target/debug" -o /tmp/dotnative-focus-smoke
+          /tmp/dotnative-focus-smoke
+
+      - name: Exercise native navigation presentation and easing
+        run: |
+          clang -fobjc-arc -framework AppKit -framework QuartzCore tests/native/macos-navigation-smoke.m -L native/core/target/debug -lcore -Wl,-rpath,"$PWD/native/core/target/debug" -o /tmp/dotnative-navigation-smoke
+          /tmp/dotnative-navigation-smoke
+
+  windows-core:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned Rust toolchain
+        run: |
+          rustup toolchain install 1.94.0 --profile minimal
+          rustup override set 1.94.0
+      - name: Test Windows engine and recycling contracts
+        run: |
+          cargo test --locked --manifest-path native/core/Cargo.toml --lib
+          cargo test --locked --manifest-path native/core/Cargo.toml --features desktop,dev-host --lib
+
+  linux-input:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Install GTK and system-input test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-4-dev xvfb xauth dbus-x11 at-spi2-core python3-pyatspi python3-pil xdotool imagemagick
+          rustup toolchain install 1.94.0 --profile minimal
+          rustup override set 1.94.0
+      - name: Build native GTK renderer and managed fixture
+        run: |
+          cargo build --locked --release --manifest-path native/core/Cargo.toml --features desktop,dev-host --bin dotnative-desktop
+          dotnet publish tools/DotNative.DevHost/DotNative.DevHost.csproj -c Release -r linux-x64 --self-contained true -p:DotNativeApp="$PWD/tests/native/InteractionApp" -p:DotNativeStartupType=InteractionApp.Program -p:DotNativePlatform=LINUX -o "$RUNNER_TEMP/interaction-managed"
+      - name: Reject premature connections without consuming the preview session
+        run: /usr/bin/python3 tests/native/preview-handshake.py --host "$RUNNER_TEMP/interaction-managed/DotNative.DevHost" --platform LINUX --output "$RUNNER_TEMP/gtk-input/handshake"
+      - name: Exercise native GTK and system mouse/keyboard with pixel assertions
+        run: bash tests/native/run-linux-interactions.sh native/core/target/release/dotnative-desktop "$RUNNER_TEMP/interaction-managed" "$RUNNER_TEMP/gtk-input"
+      - name: Exercise retained navigation timing, disposal and hidden-window completion
+        run: |
+          dotnet publish tools/DotNative.DevHost/DotNative.DevHost.csproj -c Release -r linux-x64 --self-contained true -p:DotNativeApp="$PWD/tests/native/NavigationApp" -p:DotNativeStartupType=InteractionApp.Program -p:DotNativePlatform=LINUX -o "$RUNNER_TEMP/navigation-managed"
+          xvfb-run -a dbus-run-session -- env GTK_A11Y=none GDK_BACKEND=x11 GSK_RENDERER=cairo python3 tests/native/run-navigation-timing.py LINUX --native "$PWD/native/core/target/release/dotnative-desktop" --managed "$RUNNER_TEMP/navigation-managed/DotNative.DevHost" --hide-during-transition --output "$RUNNER_TEMP/gtk-input/navigation"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gtk-input-evidence
+          path: ${{ runner.temp }}/gtk-input
+          if-no-files-found: ignore

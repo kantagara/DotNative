@@ -1,0 +1,6 @@
+<Project>
+  <ItemGroup Condition="'$(RuntimeIdentifier)' == 'ios-arm64' or '$(RuntimeIdentifier)' == 'iossimulator-arm64'">
+    <DotNativeNativeSource Include="$(MSBuildThisFileDirectory)../native/ios/device_info.m" />
+    <DotNativeNativeFramework Include="Foundation" />
+  </ItemGroup>
+</Project>

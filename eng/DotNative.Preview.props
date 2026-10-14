@@ -1,0 +1,13 @@
+<Project>
+  <!-- Loaded explicitly by the preview launcher, never by release builds.
+       Every project gets its own restore/build output per renderer target. -->
+  <PropertyGroup>
+    <_DotNativeOriginalDirectoryProps>$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildProjectDirectory)'))</_DotNativeOriginalDirectoryProps>
+  </PropertyGroup>
+  <Import Project="$(_DotNativeOriginalDirectoryProps)" Condition="'$(_DotNativeOriginalDirectoryProps)' != ''" />
+  <PropertyGroup>
+    <DefaultItemExcludes>$(DefaultItemExcludes);**/obj/**;**/bin/**</DefaultItemExcludes>
+    <BaseIntermediateOutputPath>$(DotNativePreviewBuildRoot)/$(MSBuildProjectName)/obj/</BaseIntermediateOutputPath>
+    <OutputPath>$(DotNativePreviewBuildRoot)/$(MSBuildProjectName)/bin/</OutputPath>
+  </PropertyGroup>
+</Project>

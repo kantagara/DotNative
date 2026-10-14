@@ -1,0 +1,28 @@
+<Project>
+  <PropertyGroup>
+    <DefineConstants Condition="'$(DotNativeBindingsPlatform)' == 'linux'"
+      >$(DefineConstants);DOTNATIVE_LINUX</DefineConstants>
+    <_PluginPlatform Condition="$(TargetFramework.Contains('-android'))">Android</_PluginPlatform>
+    <_PluginPlatform Condition="$(TargetFramework.Contains('-ios'))">iOS</_PluginPlatform>
+    <_PluginPlatform Condition="$(TargetFramework.Contains('-macos'))">Mac</_PluginPlatform>
+    <_PluginPlatform Condition="$(TargetFramework.Contains('-windows'))">Windows</_PluginPlatform>
+    <_PluginPlatform
+      Condition="'$(TargetFramework)' == 'net10.0' and '$(DotNativeBindingsPlatform)' == 'linux'"
+      >Linux</_PluginPlatform>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Platform/**/*.cs" />
+    <Compile Include="Platform/$(_PluginPlatform)/**/*.cs" Condition="'$(_PluginPlatform)' != ''" />
+    <Compile Remove="Unsupported.cs" Condition="'$(_PluginPlatform)' != ''" />
+  </ItemGroup>
+  <Target
+    Name="ReportAndroidBindingsAot"
+    BeforeTargets="CoreCompile"
+    Condition="'$(_PluginPlatform)' == 'Android' and '$(PublishAot)' == 'true'"
+  >
+    <Warning
+      Code="DNPLUGIN001"
+      Text="C# Android platform bindings with NativeAOT are experimental. Validate native callbacks, lifecycle and trimming on devices."
+    />
+  </Target>
+</Project>

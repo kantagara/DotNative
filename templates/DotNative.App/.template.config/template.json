@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "DotNative",
+  "classifications": ["Mobile", "iOS", "Android", "macOS", "NativeAOT", "DotNative"],
+  "identity": "DotNative.App.CSharp",
+  "name": "DotNative Mobile App",
+  "shortName": "dotnative",
+  "sourceName": "AppName",
+  "preferNameDirectory": true,
+  "tags": { "language": "C#", "type": "project" },
+  "symbols": {
+    "bundleId": { "type": "parameter", "datatype": "string", "defaultValue": "com.example.dotnativeapp", "replaces": "com.example.dotnativeapp", "description": "Unique application identifier" }
+  },
+  "sources": [{ "exclude": ["**/.gradle/**", "**/build/**", "**/bin/**", "**/obj/**", "**/artifacts/**", "**/.DS_Store", "**/xcuserdata/**", ".template.config/**"] }]
+}

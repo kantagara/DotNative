@@ -1,0 +1,103 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net9.0;net10.0</TargetFrameworks>
+    <RootNamespace>FaliNamIgrac</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <FniPublicConfiguration Condition="'$(FniPublicConfiguration)' == ''"
+      >$(MSBuildProjectDirectory)/fni.public.json</FniPublicConfiguration>
+    <ApplicationTitle>Fali nam igrač</ApplicationTitle>
+    <ApplicationVersion>1</ApplicationVersion>
+    <ApplicationDisplayVersion>0.1</ApplicationDisplayVersion>
+    <CodesignEntitlements>Platform/iOS/Runner/App.entitlements</CodesignEntitlements>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference
+      Include="$(DotNativePdfViewRoot)/DotNative.PdfView.csproj"
+      AdditionalProperties="DotNativeSourceRoot=$(DotNativeSourceRoot)"
+    />
+    <ProjectReference
+      Include="$(DotNativeShareRoot)/DotNative.Share.csproj"
+      AdditionalProperties="DotNativeSourceRoot=$(DotNativeSourceRoot)"
+    />
+    <ProjectReference
+      Include="$(DotNativeMapLauncherRoot)/DotNative.MapLauncher.csproj"
+      AdditionalProperties="DotNativeSourceRoot=$(DotNativeSourceRoot)"
+    />
+    <ProjectReference
+      Include="$(DotNativeImagePickerRoot)/DotNative.ImagePicker.csproj"
+      AdditionalProperties="DotNativeSourceRoot=$(DotNativeSourceRoot)"
+    />
+    <ProjectReference Include="$(DotNativeHiveRoot)/DotNative.Hive.csproj" />
+    <Compile Include="**/*.cs" Exclude="obj/**;bin/**;Platform/**;Native/**;.dotnative/**" />
+    <ProjectReference
+      Include="$(DotNativeCompositionRoot)/DotNative.Composition.csproj"
+      AdditionalProperties="DotNativeSourceRoot=$(DotNativeSourceRoot)"
+    />
+    <ProjectReference
+      Include="$(DotNativeToastRoot)/DotNative.Toast.csproj"
+      AdditionalProperties="DotNativeSourceRoot=$(DotNativeSourceRoot)"
+    />
+    <ProjectReference
+      Include="$(DotNativeFirebaseRoot)/DotNative.Firebase.csproj"
+      AdditionalProperties="DotNativeSourceRoot=$(DotNativeSourceRoot)"
+    />
+    <ProjectReference
+      Include="$(DotNativeMobileAdsRoot)/DotNative.GoogleMobileAds.csproj"
+      AdditionalProperties="DotNativeSourceRoot=$(DotNativeSourceRoot)"
+    />
+    <ProjectReference Include="$(DotNativeSourceRoot)/src/DotNative/DotNative.csproj" />
+    <ProjectReference
+      Include="$(DotNativeCognitoRoot)/DotNative.Cognito.csproj"
+      AdditionalProperties="DotNativeSourceRoot=$(DotNativeSourceRoot)"
+    />
+    <ProjectReference
+      Include="$(DotNativeSvgRoot)/DotNative.Svg.csproj"
+      AdditionalProperties="DotNativeSourceRoot=$(DotNativeSourceRoot)"
+    />
+    <ProjectReference Include="$(DotNativeLocalizationRoot)/src/DotNative.Localization/DotNative.Localization.csproj" />
+    <ProjectReference
+      Include="$(DotNativeLocalizationRoot)/src/DotNative.Localization.Generator/DotNative.Localization.Generator.csproj"
+      ReferenceOutputAssembly="false"
+    />
+    <Analyzer Include="$(DotNativeLocalizationRoot)/src/DotNative.Localization.Generator/bin/$(Configuration)/netstandard2.0/DotNative.Localization.Generator.dll" />
+    <Analyzer Include="$(DotNativeLocalizationRoot)/src/DotNative.Localization.Generator/bin/$(Configuration)/netstandard2.0/DotNative.Localization.Compiler.dll" />
+    <Analyzer Include="$(NuGetPackageRoot)newtonsoft.json/13.0.3/lib/netstandard2.0/Newtonsoft.Json.dll" />
+    <AdditionalFiles Include="l10n.json" />
+    <AdditionalFiles Include="Resources/Assets/localizations/*.arb" />
+    <ProjectReference
+      Include="$(DotNativeSecureStorageRoot)/DotNative.SecureStorage.csproj"
+      AdditionalProperties="DotNativeSourceRoot=$(DotNativeSourceRoot)"
+    />
+    <ProjectReference
+      Include="$(DotNativePreferencesRoot)/DotNative.Preferences.csproj"
+      AdditionalProperties="DotNativeSourceRoot=$(DotNativeSourceRoot)"
+    />
+    <ProjectReference
+      Include="$(DotNativeWheelDatePickerRoot)/DotNative.WheelDatePicker.csproj"
+      AdditionalProperties="DotNativeSourceRoot=$(DotNativeSourceRoot)"
+    />
+    <ProjectReference
+      Include="$(DotNativeWheelTimePickerRoot)/DotNative.WheelTimePicker.csproj"
+      AdditionalProperties="DotNativeSourceRoot=$(DotNativeSourceRoot)"
+    />
+    <EmbeddedResource
+      Include="Resources/Assets/**/*"
+      Exclude="Resources/Assets/**/.DS_Store;Resources/Assets/localizations/**/*"
+      LogicalName="fni/%(RecursiveDir)%(Filename)%(Extension)"
+    />
+    <EmbeddedResource
+      Include="$(FniPublicConfiguration)"
+      LogicalName="fni/public-configuration.json"
+      Condition="Exists('$(FniPublicConfiguration)')"
+    />
+    <PackageReference Include="DotNetEnv" Version="3.2.0" />
+    <PackageReference Include="AWSSDK.CognitoIdentity" Version="4.0.2.18" />
+    <PackageReference Include="AWSSDK.S3" Version="4.0.0" />
+    <PackageReference Include="Amazon.Extensions.CognitoAuthentication" Version="3.1.5" />
+  </ItemGroup>
+  <Import Project="$(DotNativeFirebaseRoot)/buildTransitive/DotNative.Firebase.targets" />
+  <Import Project="$(DotNativeMobileAdsRoot)/buildTransitive/DotNative.GoogleMobileAds.targets" />
+  <Import Project="$(DotNativePdfViewRoot)/buildTransitive/DotNative.PdfView.targets" />
+</Project>

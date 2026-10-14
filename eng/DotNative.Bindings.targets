@@ -1,0 +1,163 @@
+<Project>
+  <!-- Opt-in integration proof: compile the existing app and Rust renderer with
+       the platform SDK's NativeAOT bindings support. Never used by normal builds. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IlcExportUnmanagedEntrypoints>true</IlcExportUnmanagedEntrypoints>
+    <DefineConstants>$(DefineConstants);DOTNATIVE_BINDINGS</DefineConstants>
+    <ApplicationId Condition="'$(ApplicationId)' == ''">com.dotnative.counter</ApplicationId>
+    <ApplicationTitle Condition="'$(ApplicationTitle)' == ''"
+      >$(MSBuildProjectName)</ApplicationTitle>
+    <DotNativeAppDirectory Condition="'$(DotNativeAppDirectory)' == ''"
+      >$(MSBuildProjectDirectory)</DotNativeAppDirectory>
+    <DotNativeStartupType Condition="'$(DotNativeStartupType)' == ''"
+      >Counter.Program</DotNativeStartupType>
+    <ApplicationVersion>1</ApplicationVersion>
+    <ApplicationDisplayVersion>0.1</ApplicationDisplayVersion>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <EventSourceSupport>false</EventSourceSupport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(DotNativeBindingsPlatform)' == 'android'">
+    <NativeLib>Shared</NativeLib>
+    <CustomNativeMain>true</CustomNativeMain>
+    <DefineConstants>$(DefineConstants);DOTNATIVE_ANDROID</DefineConstants>
+    <SupportedOSPlatformVersion>30.0</SupportedOSPlatformVersion>
+    <AndroidPackageFormat>apk</AndroidPackageFormat>
+    <AndroidCreatePackagePerAbi>false</AndroidCreatePackagePerAbi>
+    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+    <DotNativeCoreArchive>$(DotNativeRepositoryRoot)native/core/target/aarch64-linux-android/release/libcore.a</DotNativeCoreArchive>
+  </PropertyGroup>
+  <Target
+    Name="CollectDotNativeBindingsJava"
+    AfterTargets="Build"
+    Condition="'$(DotNativeBindingsPlatform)' == 'android'"
+  >
+    <!-- Include runtime Java assets selected by the SDK, including crypto JNI helpers. -->
+    <Copy
+      SourceFiles="@(_ResolvedJavaLibraries)"
+      DestinationFolder="$(OutputPath)dotnative-java"
+      SkipUnchangedFiles="true"
+    />
+  </Target>
+  <Target
+    Name="ExportDotNativeBindingsJni"
+    AfterTargets="IlcCompile"
+    Condition="'$(DotNativeBindingsPlatform)' == 'android'"
+  >
+    <Exec Command="perl -0777 -pi -e 'if (!/Java_com_dotnative_runtime_NativeHost_/) { s/global:/global: Java_com_dotnative_runtime_NativeHost_*; Java_com_dotnative_plugins_NativeChannels_*;/; }' &quot;$(ExportsFile)&quot;" />
+  </Target>
+  <Target
+    Name="PreserveDotNativeBindingsProvider"
+    AfterTargets="_AddStaticResources"
+    Condition="'$(DotNativeBindingsPlatform)' == 'android'"
+  >
+    <!-- SDK 36.1.69 does not list this generated source in FileWrites. Without
+         retaining it, incremental cleanup can remove the provider after build. -->
+    <CopyResource
+      ResourceName="NativeAotRuntimeProvider.java"
+      OutputPath="$(_AndroidIntermediateJavaSourceDirectory)net/dot/jni/nativeaot/NativeAotRuntimeProvider.java"
+      Condition="!Exists('$(_AndroidIntermediateJavaSourceDirectory)net/dot/jni/nativeaot/NativeAotRuntimeProvider.java')"
+    />
+    <ItemGroup>
+      <FileWrites Include="$(_AndroidIntermediateJavaSourceDirectory)net/dot/jni/nativeaot/NativeAotRuntimeProvider.java" />
+    </ItemGroup>
+  </Target>
+  <PropertyGroup Condition="'$(DotNativeBindingsPlatform)' == 'ios' or '$(DotNativeBindingsPlatform)' == 'macos'">
+    <StartupObject>DotNative.Generated.BindingsBootstrap</StartupObject>
+    <DefineConstants Condition="'$(DotNativeBindingsPlatform)' == 'ios'"
+      >$(DefineConstants);DOTNATIVE_IOS</DefineConstants>
+    <DefineConstants Condition="'$(DotNativeBindingsPlatform)' == 'macos'"
+      >$(DefineConstants);DOTNATIVE_MACOS</DefineConstants>
+    <SupportedOSPlatformVersion Condition="'$(DotNativeBindingsPlatform)' == 'ios'"
+      >16.0</SupportedOSPlatformVersion>
+    <SupportedOSPlatformVersion Condition="'$(DotNativeBindingsPlatform)' == 'macos'"
+      >13.0</SupportedOSPlatformVersion>
+    <_BindingsRustTarget Condition="'$(RuntimeIdentifier)' == 'ios-arm64'"
+      >aarch64-apple-ios</_BindingsRustTarget>
+    <_BindingsRustTarget Condition="'$(RuntimeIdentifier)' == 'iossimulator-arm64'"
+      >aarch64-apple-ios-sim</_BindingsRustTarget>
+    <_BindingsRustTarget Condition="'$(RuntimeIdentifier)' == 'osx-arm64'"
+      >aarch64-apple-darwin</_BindingsRustTarget>
+    <DotNativeCoreArchive>$(DotNativeRepositoryRoot)native/core/target/$(_BindingsRustTarget)/release/libcore.a</DotNativeCoreArchive>
+    <_BindingsApplePlatform Condition="'$(DotNativeBindingsPlatform)' == 'ios'"
+      >iOS</_BindingsApplePlatform>
+    <_BindingsApplePlatform Condition="'$(DotNativeBindingsPlatform)' == 'macos'"
+      >Mac</_BindingsApplePlatform>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Gradle compiles the existing Java runner; this SDK stage supplies bindings assets. -->
+    <AndroidJavaSource Remove="Platform/**/*.java" />
+    <AndroidResource Remove="Platform/**" />
+    <AndroidLibrary Remove="Platform/**" />
+    <AndroidJavaLibrary Remove="Platform/**" />
+    <AndroidNativeLibrary Remove="Platform/**" />
+    <Compile Include="$(DotNativeRepositoryRoot)packaging/DotNative.App/tools/AppEntry.cs" />
+    <ProjectReference
+      Include="$(DotNativeRepositoryRoot)src/DotNative/DotNative.csproj"
+      GlobalPropertiesToRemove="RuntimeIdentifier;PublishAot;PublishAotUsingRuntimePack;NativeLib"
+    />
+    <ProjectReference
+      Condition="'$(DotNativeStartupType)' == 'Counter.Program'"
+      Include="$(DotNativeRepositoryRoot)plugins/DotNative.BindingsProbe/DotNative.BindingsProbe.csproj"
+      GlobalPropertiesToRemove="RuntimeIdentifier;PublishAot;PublishAotUsingRuntimePack;NativeLib"
+    />
+    <NativeLibrary Include="$(DotNativeCoreArchive)" />
+    <DirectPInvoke Include="core" />
+    <DirectPInvoke Include="__Internal" />
+    <UnmanagedEntryPointsAssembly Include="$(AssemblyName)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(DotNativeBindingsPlatform)' == 'ios' or '$(DotNativeBindingsPlatform)' == 'macos'">
+    <Compile Include="$(DotNativeRepositoryRoot)eng/BindingsBootstrap.cs" />
+    <NativeLibrary Include="$(IntermediateOutputPath)DotNativeRunner.o" />
+    <LinkerArgument Include="-framework" />
+    <LinkerArgument Include="QuartzCore" />
+    <LinkerArgument Include="-framework" />
+    <LinkerArgument Include="CoreGraphics" />
+    <LinkerArgument
+      Include="-Wl,-U,_dotnative_register_plugins"
+      Condition="'$(DotNativeBindingsPlatform)' == 'ios'"
+    />
+  </ItemGroup>
+  <Target
+    Name="BuildDotNativeBindingsRunner"
+    BeforeTargets="_CompileNativeExecutable;LinkNative"
+    Condition="'$(DotNativeBindingsPlatform)' == 'ios' or '$(DotNativeBindingsPlatform)' == 'macos'"
+  >
+    <PropertyGroup>
+      <_BindingsSdk Condition="'$(RuntimeIdentifier)' == 'ios-arm64'">iphoneos</_BindingsSdk>
+      <_BindingsTriple Condition="'$(RuntimeIdentifier)' == 'ios-arm64'"
+        >arm64-apple-ios16.0</_BindingsTriple>
+      <_BindingsSdk Condition="'$(RuntimeIdentifier)' == 'iossimulator-arm64'"
+        >iphonesimulator</_BindingsSdk>
+      <_BindingsTriple Condition="'$(RuntimeIdentifier)' == 'iossimulator-arm64'"
+        >arm64-apple-ios16.0-simulator</_BindingsTriple>
+      <_BindingsSdk Condition="'$(RuntimeIdentifier)' == 'osx-arm64'">macosx</_BindingsSdk>
+      <_BindingsTriple Condition="'$(RuntimeIdentifier)' == 'osx-arm64'"
+        >arm64-apple-macos13.0</_BindingsTriple>
+    </PropertyGroup>
+    <Exec Command="xcrun --sdk $(_BindingsSdk) clang -target $(_BindingsTriple) -fobjc-arc -Dmain=dotnative_runner_main -c &quot;$(DotNativeAppDirectory)/Platform/$(_BindingsApplePlatform)/Runner/main.m&quot; -o &quot;$(IntermediateOutputPath)DotNativeRunner.o&quot;" />
+  </Target>
+  <Target Name="GenerateDotNativeBindingsEntry" BeforeTargets="CoreCompile">
+    <WriteLinesToFile
+      File="$(IntermediateOutputPath)DotNative.Entry.g.cs"
+      Lines="namespace DotNative.Generated { internal static partial class AppEntry { private static partial global::System.Threading.Tasks.Task InvokeMain() =&gt; global::DotNative.Hosting.MainEntry.Invoke(global::$(DotNativeStartupType).Main)%3B } }"
+      Overwrite="true"
+      WriteOnlyWhenDifferent="true"
+    />
+    <WriteLinesToFile
+      File="$(IntermediateOutputPath)BindingsRoots.xml"
+      Overwrite="true"
+      Lines="&lt;linker&gt;&lt;assembly fullname=&quot;$(AssemblyName)&quot;&gt;&lt;type fullname=&quot;DotNative.Generated.AppEntry&quot; preserve=&quot;all&quot; /&gt;&lt;/assembly&gt;&lt;/linker&gt;"
+    />
+    <ItemGroup>
+      <TrimmerRootDescriptor Include="$(IntermediateOutputPath)BindingsRoots.xml" />
+      <Compile Include="$(IntermediateOutputPath)DotNative.Entry.g.cs" />
+    </ItemGroup>
+  </Target>
+  <ItemGroup Condition="'$(DotNativeBindingsPlatform)' == 'ios'">
+    <PartialAppManifest Include="$(MSBuildThisFileDirectory)Bindings.iOS.plist" />
+  </ItemGroup>
+</Project>

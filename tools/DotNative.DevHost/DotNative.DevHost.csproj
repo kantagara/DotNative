@@ -1,0 +1,63 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework Condition="'$(DotNativeBindingsPlatform)' == 'windows'"
+      >net10.0-windows10.0.19041.0</TargetFramework>
+    <DefineConstants Condition="'$(DotNativeBindingsPlatform)' != ''"
+      >$(DefineConstants);DOTNATIVE_BINDINGS</DefineConstants>
+    <OutputType>Exe</OutputType>
+    <StartupObject>DotNative.Development.Program</StartupObject>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <DotNativeApp Condition="'$(DotNativeApp)' == ''"
+      >$(MSBuildThisFileDirectory)../../Samples/WidgetSamples</DotNativeApp>
+    <DotNativeStartupType Condition="'$(DotNativeStartupType)' == ''"
+      >WidgetSamples.Program</DotNativeStartupType>
+    <DotNativePlatform Condition="'$(DotNativePlatform)' == ''">IOS</DotNativePlatform>
+    <DefineConstants>$(DefineConstants);DOTNATIVE_$(DotNativePlatform);DOTNATIVE_REMOTE_PREVIEW</DefineConstants>
+    <DotNativeSourcePlatform Condition="'$(DotNativePlatform)' == 'WINDOWS'"
+      >Windows</DotNativeSourcePlatform>
+    <DotNativeSourcePlatform Condition="'$(DotNativePlatform)' == 'LINUX'"
+      >Linux</DotNativeSourcePlatform>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="*.cs" />
+    <Compile
+      Condition="'$(DotNativePreviewAppProject)' == ''"
+      Include="$(DotNativeApp)/**/*.cs"
+      Exclude="$(DotNativeApp)/bin/**;$(DotNativeApp)/obj/**;$(DotNativeApp)/Platform/**;$(DotNativeApp)/artifacts/**;$(DotNativeApp)/Native/**"
+    />
+    <ProjectReference Include="../../src/DotNative/DotNative.csproj" />
+    <Compile
+      Include="$(DotNativeApp)/Platform/$(DotNativeSourcePlatform)/**/*.cs"
+      Condition="'$(DotNativeSourcePlatform)' != '' and '$(DotNativePreviewAppProject)' == ''"
+    />
+    <ProjectReference Include="../../plugins/DotNative.DeviceInfo/DotNative.DeviceInfo.csproj" Condition="'$(DotNativePreviewAppProject)' == ''" />
+    <ProjectReference Include="$(DotNativePreviewAppProject)" Condition="'$(DotNativePreviewAppProject)' != ''" />
+  </ItemGroup>
+  <Import Project="$(DotNativePreviewPlugins)" Condition="Exists('$(DotNativePreviewPlugins)') and '$(DotNativePreviewAppProject)' == ''" />
+  <ItemGroup Condition="('$(DotNativeBindingsPlatform)' == 'windows' or '$(DotNativeBindingsPlatform)' == 'linux') and '$(DotNativeStartupType)' == 'Counter.Program'">
+    <ProjectReference Include="../../plugins/DotNative.BindingsProbe/DotNative.BindingsProbe.csproj" />
+  </ItemGroup>
+  <Target Name="GeneratePreviewEntry" BeforeTargets="CoreCompile">
+    <WriteLinesToFile
+      File="$(IntermediateOutputPath)PreviewEntry.g.cs"
+      Overwrite="true"
+      WriteOnlyWhenDifferent="true"
+      Condition="'$(DotNativePreviewAppProject)' == ''"
+      Lines="namespace DotNative.Development%3B internal static class PreviewEntry { internal static System.Threading.Tasks.Task Invoke() =&gt; DotNative.Hosting.MainEntry.Invoke(global::$(DotNativeStartupType).Main)%3B }"
+    />
+    <WriteLinesToFile
+      File="$(IntermediateOutputPath)PreviewEntry.g.cs"
+      Overwrite="true"
+      WriteOnlyWhenDifferent="true"
+      Condition="'$(DotNativePreviewAppProject)' != ''"
+      Lines="namespace DotNative.Development%3B internal static class PreviewEntry { internal static System.Threading.Tasks.Task Invoke() =&gt; PreviewApplication.Invoke(&quot;$(DotNativePreviewAppAssembly)&quot;, &quot;$(DotNativeStartupType)&quot;)%3B }"
+    />
+    <ItemGroup>
+      <Compile Include="$(IntermediateOutputPath)PreviewEntry.g.cs" />
+    </ItemGroup>
+  </Target>
+</Project>

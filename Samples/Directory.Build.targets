@@ -1,0 +1,10 @@
+<Project>
+  <Import
+    Project="../eng/DotNative.Development.targets"
+    Condition="'$(DotNativeDevelopment)' == 'true' and '$(DotNativeBindingsPlatform)' == ''"
+  />
+  <Import
+    Project="../eng/DotNative.Bindings.targets"
+    Condition="'$(DotNativeBindingsPlatform)' != ''"
+  />
+</Project>

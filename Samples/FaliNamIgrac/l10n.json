@@ -1,0 +1,7 @@
+{
+  "arb-dir": "Resources/Assets/localizations",
+  "template-arb-file": "app_en.arb",
+  "output-class": "AppLocalizations",
+  "namespace": "FaliNamIgrac",
+  "preferred-supported-locales": ["en", "sr", "ru"]
+}

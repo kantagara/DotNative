@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <TargetFramework>net9.0</TargetFramework>
+    <Version>0.1.0-preview.10</Version>
+    <Authors>DotNative</Authors>
+    <Description>Optional DotNative iOS device information plugin; native code stays outside core.</Description>
+    <LangVersion>12</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IsAotCompatible>true</IsAotCompatible>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Update="README.md" Pack="true" PackagePath="README.md" />
+    <None Update="native/ios/device_info.m" Pack="true" PackagePath="native/ios/device_info.m" />
+    <None
+      Update="buildTransitive/DotNative.DeviceInfo.targets"
+      Pack="true"
+      PackagePath="buildTransitive/DotNative.DeviceInfo.targets"
+    />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="../../LICENSE" Pack="true" PackagePath="/" />
+    <None Include="../../THIRD_PARTY_NOTICES" Pack="true" PackagePath="/" />
+  </ItemGroup>
+</Project>
